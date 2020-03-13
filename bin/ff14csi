@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+const { version } = require('../package.json');
+const program = require('commander');
+const Client = require('..');
+
+program
+  .option('-u, --user   <username>', '登录所用的用户名')
+  .option('-p, --passwd <password>', '登录所用的密码')
+  .option('-a, --area   <areaName>', '陆行鸟 / 莫古力 / 猫小胖')
+  .option('-s, --server <serverName>', '角色所在服务器')
+  .option('-r, --role   <roleName>', '角色名')
+  .option('')
+  .version(`v${version}`, '-v, --version', 'output version')
+  .parse(process.argv);
+
+const { user, passwd, area, server, role } = program;
+try {
+  const ff14 = new Client({ user, passwd, area, server, role }, { log: true });
+  ff14.signIn().catch(e => ff14.log('ERROR:', e.message));
+} catch (error) {
+  console.error(`\nERROR: ${error.message}\n`);
+  program.outputHelp();
+}
