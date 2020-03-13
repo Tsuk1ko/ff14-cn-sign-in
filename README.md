@@ -1,5 +1,7 @@
 # FF14 国服积分签到
 
+![example](https://i.loli.net/2020/03/14/vxXtIwOjlRgJc87.png)
+
 这是用 node 重写的版本，原版为 python 所写，见 forked from
 
 ※ 暂不支持 WeGame 帐号
