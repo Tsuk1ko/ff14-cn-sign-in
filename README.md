@@ -2,7 +2,7 @@
 
 ![example](https://i.loli.net/2020/03/14/vxXtIwOjlRgJc87.png)
 
-这是用 node 重写的版本，原版为 python 所写，见 forked from
+这是用 node 重写的版本，原版为 python 所写的 [renchangjiu/FF14AutoSignIn](https://github.com/renchangjiu/FF14AutoSignIn)
 
 ※ 暂不支持 WeGame 帐号
 
@@ -13,7 +13,7 @@
 到 [releases](../../releases) 页面按系统下载对应版本的并解压得到可执行文件，以`ff14csi-win-x64.exe`为例，然后可以执行
 
 ```bash
-ff14csi-win-x64.exe -u 用户名 -p 密码 -a 大区 -s 服务器 -r 角色名
+ff14csi-win-x64.exe -u 帐号 -p 密码 -a 大区 -s 服务器 -r 角色名
 ```
 
 例如
@@ -31,7 +31,7 @@ npm i -g ff14-cn-sign-in
 然后就可以直接使用`ff14csi`命令，使用方法与上面同理
 
 ```bash
-ff14csi -u 用户名 -p 密码 -a 大区 -s 服务器 -r 角色名
+ff14csi -u 帐号 -p 密码 -a 大区 -s 服务器 -r 角色名
 ```
 
 ## API
@@ -40,7 +40,7 @@ ff14csi -u 用户名 -p 密码 -a 大区 -s 服务器 -r 角色名
 const Client = require('ff14-cn-sign-in');
 const jifen = new Client(
   {
-    user:   '用户名',
+    user:   '帐号',
     passwd: '密码',
     area:   '大区',
     server: '服务器',
