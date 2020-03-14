@@ -1,6 +1,6 @@
 {
   "name": "ff14-cn-sign-in",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "FF14 国服积分签到",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,8 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
-    "commander": "^4.1.1",
+    "colors": "^1.4.0",
+    "commander": "^5.0.0",
     "cookie": "^0.4.0",
     "qs": "^6.9.1",
     "set-cookie-parser": "^2.4.3"
