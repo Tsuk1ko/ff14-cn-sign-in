@@ -1,23 +1,22 @@
 {
   "name": "ff14-cn-sign-in",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "FF14 国服积分签到",
   "main": "index.js",
   "bin": {
     "ff14csi": "bin/ff14csi"
   },
   "scripts": {
-    "build": "pkg bin/ff14csi --out-path build --targets latest-win-x86,latest-win-x64,latest-linux-x64,latest-macos-x64"
+    "build": "pkg bin/ff14csi --out-path build --targets node8-win-x86,node8-win-x64,node8-linux-x64,node8-macos-x64"
   },
   "repository": "https://github.com/Tsuk1ko/ff14-cn-sign-in.git",
   "author": "神代綺凜 <i@loli.best>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.20.0",
     "colors": "^1.4.0",
-    "commander": "^5.0.0",
-    "cookie": "^0.4.0",
-    "qs": "^6.9.1",
-    "set-cookie-parser": "^2.4.3"
+    "commander": "^5.1.0",
+    "cookie": "^0.4.1",
+    "set-cookie-parser": "^2.4.6"
   }
 }
