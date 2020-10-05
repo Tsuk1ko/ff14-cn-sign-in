@@ -1,6 +1,5 @@
 require('colors');
-const { get, post } = require('axios');
-const { stringify: qs } = require('qs');
+const { get } = require('axios');
 const Cookie = require('./src/cookie');
 const FF14CSIError = require('./src/error');
 
@@ -38,7 +37,6 @@ class Client {
       if (this.options.log) console.log(...argv);
     };
 
-    logWithTime('参数', JSON.stringify(this.config));
     if (Object.values(this.config).some(v => !v)) throw new FF14CSIError('参数缺失');
     if (!(this.config.area in areaIdEnum)) throw new FF14CSIError('大区有误');
     const areaId = areaIdEnum[this.config.area];
@@ -50,6 +48,7 @@ class Client {
 
     // 获取 ticket
     const step1 = async () => {
+      stdoutWithTime('登录');
       const res = await get('https://cas.sdo.com/authen/staticLogin.jsonp', {
         headers,
         params: {
@@ -76,11 +75,13 @@ class Client {
       this.cookies.storeFromResponse(res);
       const data = JSON.parse(res.data.replace(/staticLogin_JSONPMethod\((.+)\)/, '$1'));
       if (!data.data.ticket) throw new Error(data.data.failReason || data.return_message || '登录失败，可能是由于异地登录/登陆次数过多，服务器已要求验证码，请先通过网页方式正常签到，1~3 天后再试');
+      log('√');
       return data.data.ticket;
     };
 
     // 设置 cookie
     const step2 = async () => {
+      stdoutWithTime('设置 Cookie', '1/3');
       const res = await get('http://login.sdo.com/sdo/Login/Tool.php', {
         headers: getHeader(),
         params: {
@@ -91,10 +92,12 @@ class Client {
         },
       });
       this.cookies.storeFromResponse(res);
+      log('√');
     };
 
     // 设置 cookie
     const step3 = async () => {
+      stdoutWithTime('设置 Cookie', '2/3');
       const res = await get('https://cas.sdo.com/authen/getPromotionInfo.jsonp', {
         headers: getHeader(),
         params: {
@@ -116,10 +119,12 @@ class Client {
         },
       });
       this.cookies.storeFromResponse(res);
+      log('√');
     };
 
     // 设置 cookie
     const step4 = async ticket => {
+      stdoutWithTime('设置 Cookie', '3/3');
       const res = await get('http://act.ff.sdo.com/20180707jifen/Server/SDOLogin.ashx', {
         headers: getHeader(),
         params: {
@@ -128,10 +133,12 @@ class Client {
         },
       });
       this.cookies.storeFromResponse(res);
+      log('√');
     };
 
     // 获取角色列表
     const step5 = async () => {
+      stdoutWithTime('获取角色列表');
       const res = await get('http://act.ff.sdo.com/20180707jifen/Server/ff14/HGetRoleList.ashx', {
         headers: getHeader(),
         params: {
@@ -144,74 +151,61 @@ class Client {
       const { server, role } = this.config;
       const found = data.Attach.find(({ worldnameZh, name }) => worldnameZh === server && name === role);
       if (!found) throw new Error('没有找到对应的角色');
+      log('√');
       return [found.cicuid, found.worldname, found.groupid].join('|');
     };
 
     // 选择区服及角色
     const step6 = async roleStr => {
+      stdoutWithTime('选择区服及角色');
       const { area, server, role } = this.config;
-      const res = await post(
-        'http://act.ff.sdo.com/20180707jifen/Server/ff14/HGetRoleList.ashx',
-        qs({
+      const res = await get('http://act.ff.sdo.com/20180707jifen/Server/ff14/HGetRoleList.ashx', {
+        headers: getHeader(),
+        params: {
           method: 'setff14role',
           AreaId: areaId,
           AreaName: area,
           RoleName: `[${server}]${role}`,
           Role: roleStr,
           i: '0.8326684884385089',
-        }),
-        { headers: getHeader() }
-      );
+        },
+      });
       this.cookies.storeFromResponse(res);
+      log('√');
     };
 
     // 签到
     const step7 = async () => {
-      const res = await post(
-        'http://act.ff.sdo.com/20180707jifen/Server/User.ashx',
-        qs({
+      stdoutWithTime('签到中');
+      const res = await get('http://act.ff.sdo.com/20180707jifen/Server/User.ashx', {
+        headers: getHeader(),
+        params: {
           method: 'signin',
           i: '0.855755357775076',
-        }),
-        { headers: getHeader() }
-      );
-      log(res.data.Message);
+        },
+      });
+      log(String(res.data.Message).trim());
     };
 
     // 查询积分
     const step8 = async () => {
-      const res = await post(
-        'http://act.ff.sdo.com/20180707jifen/Server/User.ashx',
-        qs({
+      const res = await get('http://act.ff.sdo.com/20180707jifen/Server/User.ashx', {
+        headers: getHeader(),
+        params: {
           method: 'querymystatus',
           i: '0.855755357775076',
-        }),
-        { headers: getHeader() }
-      );
-      log('当前积分', JSON.parse(res.data.Attach).Jifen);
+        },
+      });
+      logWithTime('当前积分', JSON.parse(res.data.Attach).Jifen);
     };
 
-    stdoutWithTime('登录');
     const ticket = await step1();
-    log('√');
-    stdoutWithTime('设置 Cookie', '1/3');
     await step2();
-    log('√');
-    stdoutWithTime('设置 Cookie', '2/3');
     await step3();
-    log('√');
-    stdoutWithTime('设置 Cookie', '3/3');
     await step4(ticket);
-    log('√');
-    stdoutWithTime('获取角色列表');
     const roleStr = await step5();
-    log('√');
-    stdoutWithTime('选择区服及角色');
     await step6(roleStr);
-    log('√');
-    stdoutWithTime('签到中');
     await step7();
-    log('√');
     await step8();
   }
 }
